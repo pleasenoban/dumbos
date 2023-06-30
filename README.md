@@ -1,6 +1,6 @@
 # dumb os
 
-a dumb os in c made by a braindead man
+a dumb os in c (chock full of bad design decisions) made by a braindead man
 <br>
 <sub><sub>and yes i use bash scripts instead of a proper makefile don't judge</sub></sub>
 

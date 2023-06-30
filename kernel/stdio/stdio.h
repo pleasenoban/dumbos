@@ -10,5 +10,5 @@
 #define EOF (-1)
 
 int putchar(int ic);
-int printf(const char* restrict format, ...);
-int puts(const char* string);
+int printf(const char *restrict format, ...);
+int puts(const char *string);

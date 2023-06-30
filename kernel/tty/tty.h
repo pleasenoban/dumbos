@@ -6,7 +6,8 @@
 #include "../string/string.h"
 
 /* Hardware text mode color constants. */
-enum vga_color {
+enum vga_color
+{
 	VGA_COLOR_BLACK = 0,
 	VGA_COLOR_BLUE = 1,
 	VGA_COLOR_GREEN = 2,
@@ -28,7 +29,7 @@ enum vga_color {
 void terminal_initialize(void);
 void terminal_setcolor(uint8_t color);
 void terminal_putentryat(char c, uint8_t color, size_t x, size_t y);
-void terminal_write(const char* data, size_t size);
-void terminal_writestring(const char* data);
+void terminal_write(const char *data, size_t size);
+void terminal_writestring(const char *data);
 void terminal_disable_cursor();
 void update_cursor(int x, int y);

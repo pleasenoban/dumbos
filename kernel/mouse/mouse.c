@@ -1,13 +1,12 @@
 #include "mouse.h"
 
-#define DE_MOUSE_SENS 20
-
 uint8_t mouse_cycle = 0;
 int8_t mouse_byte[3];
 int8_t delta_mouse_x = 0;
 int8_t delta_mouse_y = 0;
 int32_t mouse_x = 0;
 int32_t mouse_y = 0;
+double mouse_sens = 1;
 
 // Mouse functions
 void mouse_handler(struct regs *r) // struct regs *r (not used but just there)
@@ -26,8 +25,8 @@ void mouse_handler(struct regs *r) // struct regs *r (not used but just there)
         mouse_byte[2] = inb(0x60);
         delta_mouse_x = mouse_byte[1];
         delta_mouse_y = mouse_byte[2];
-        mouse_x += (int32_t)delta_mouse_x / DE_MOUSE_SENS;
-        mouse_y -= (int32_t)delta_mouse_y / DE_MOUSE_SENS;
+        mouse_x += (int32_t)((int32_t)delta_mouse_x * mouse_sens);
+        mouse_y -= (int32_t)((int32_t)delta_mouse_y * mouse_sens);
         mouse_x = clamp(mouse_x, 0, 79);
         mouse_y = clamp(mouse_y, 0, 24);
         // printf("x: %s, y: ", itoa(mouse_x, 10));
@@ -115,4 +114,9 @@ void mouse_install()
 
     // Setup the mouse handler
     irq_install_handler(12, mouse_handler);
+}
+
+void mouse_set_sens(double sens)
+{
+    mouse_sens = sens;
 }

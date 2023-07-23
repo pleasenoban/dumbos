@@ -46,6 +46,14 @@ unsigned char kbdus[128] =
         0, /* All other keys are undefined */
 };
 
+void on_keyboard_press(unsigned char c) {
+    printf("%c pressed\n", kbdus[c]);
+}
+
+void on_keyboard_release(char c) {
+    printf("%c released\n", kbdus[c]);
+}
+
 /* Handles the keyboard interrupt */
 void keyboard_handler(struct regs *r)
 {
@@ -60,6 +68,7 @@ void keyboard_handler(struct regs *r)
     {
         /* You can use this one to see if the user released the
          *  shift, alt, or control keys... */
+        on_keyboard_release(scancode & 0x7F);
     }
     else
     {
@@ -75,7 +84,7 @@ void keyboard_handler(struct regs *r)
          *  to the above layout to correspond to 'shift' being
          *  held. If shift is held using the larger lookup table,
          *  you would add 128 to the scancode when you look for it */
-        putchar(kbdus[scancode]);
+        on_keyboard_press(scancode);
     }
 }
 

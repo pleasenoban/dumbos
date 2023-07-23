@@ -8,4 +8,5 @@
 #include "../math/math.h"
 
 void mouse_install();
-void mouse_set_sens(double sens);
+void mouse_set_sens();
+// void mouse_set_sample_rate(uint8_t sample_rate);

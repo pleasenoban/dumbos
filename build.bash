@@ -5,7 +5,7 @@ clear
 
 GCC=i686-elf-tools/output/bin/i686-elf-gcc
 NASM=nasm
-GRUB_MKRESCUE=grub2-mkrescue
+GRUB_MKRESCUE=grub-mkrescue
 
 # clean up old build
 bash clean.bash

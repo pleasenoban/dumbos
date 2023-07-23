@@ -9,6 +9,7 @@ a dumb os in c (chock full of bad design decisions) made by a braindead man
 ### prerequisites
 * i686-elf-tools
 * grub/grub2
+* nasm
 * qemu (or any other virtualization software)
 
 ```bash

@@ -3,6 +3,9 @@
 set -e
 clear
 
+CCFLAGS="-std=gnu99 -ffreestanding -O2 -Wall -Wextra"
+ASFLAGS="-felf32"
+LDFLAGS="-ffreestanding -O2 -nostdlib -lgcc"
 GCC=i686-elf-tools/output/bin/i686-elf-gcc
 NASM=nasm
 GRUB_MKRESCUE=grub-mkrescue
@@ -12,19 +15,17 @@ bash clean.bash
 # build kernel
 mkdir build
 # compile all the c files
-# $GCC -c kernel/kernel.c -o build/kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 for f in $(find ./kernel -name '*.c'); do
     base=$(basename $f)
-    $GCC -c $f -o build/${base}.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+    $GCC -c $f -o build/${base}.o $CCFLAGS
 done;
 # compile all the assembly files
-# $NASM -felf32 kernel/boot.s -o build/boot.o
 for f in $(find ./kernel -name '*.s'); do
     base=$(basename $f)
-    $NASM -felf32 $f -o build/${base}.o
+    $NASM $f -o build/${base}.o $ASFLAGS
 done;
 # linking it all together
-$GCC -T linker.ld -o build/os.bin -ffreestanding -O2 -nostdlib build/*.o -lgcc
+$GCC -T linker.ld -o build/os.bin build/*.o $LDFLAGS
 
 # make iso
 mkdir -p isodir/boot/grub

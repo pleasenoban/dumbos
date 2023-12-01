@@ -1,6 +1,6 @@
 #include "pit.h"
 
-#define HZ 100
+#define HZ 1000
 
 // http://www.osdever.net/bkerndev/Docs/pit.htm
 /* This will keep track of how many ticks that the system
@@ -44,11 +44,8 @@ void timer_install()
 
 /* This will continuously loop until the given time has
  *  been reached */
-void timer_wait(int ticks)
+void timer_wait(uint32_t ticks)
 {
-    unsigned long eticks;
-
-    eticks = timer_ticks + ticks;
-    while (timer_ticks < eticks)
-        ;
+    uint32_t eticks = timer_ticks + ticks;
+    while (timer_ticks < eticks) asm volatile ("nop");
 }

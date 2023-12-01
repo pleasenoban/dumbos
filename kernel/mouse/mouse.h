@@ -6,6 +6,7 @@
 #include "../stdio/stdio.h"
 #include "../string/string.h"
 #include "../math/math.h"
+#include "../logger/logger.h"
 
 void mouse_install();
 void mouse_set_sens();

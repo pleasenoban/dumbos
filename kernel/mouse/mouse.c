@@ -2,24 +2,28 @@
 
 // https://forum.osdev.org/viewtopic.php?t=10247
 
+uint32_t mouse_max_width = 79;
+uint32_t mouse_max_height = 24;
 uint8_t mouse_cycle = 0;
-int8_t mouse_byte[3];
+int8_t mouse_byte[4];
 int8_t mouse_click_data = 0;
 int8_t mouse_delta_x = 0;
 int8_t mouse_delta_y = 0;
+int8_t mouse_delta_z = 0;
 double mouse_x = 0;
 double mouse_y = 0;
 double mouse_sens = 1;
 bool mouse_left_clicked = false;
 bool mouse_right_clicked = false;
 bool mouse_middle_clicked = false;
+bool mouse_can_scroll = false;
 
 void on_mouse_move() {
     printf("mouse move :o\n");
     mouse_x += mouse_delta_x * mouse_sens;
     mouse_y -= mouse_delta_y * mouse_sens;
-    mouse_x = clamp(mouse_x, 0, 79);
-    mouse_y = clamp(mouse_y, 0, 24);
+    mouse_x = clamp(mouse_x, 0, mouse_max_width);
+    mouse_y = clamp(mouse_y, 0, mouse_max_height);
     // printf("x: %s, y: ", itoa(mouse_x, 10));
     // printf("%s\ndelta x: ", itoa(mouse_y, 10));
     // printf("%s, delta y: ", itoa(delta_mouse_x, 10));
@@ -51,6 +55,10 @@ void on_mouse_middle_release() {
     printf("middle release :o\n");
 }
 
+void on_mouse_scroll() {
+    printf("mouse pixels scroll: %s :o\n", itoa(mouse_delta_z, 10));
+}
+
 // Mouse functions
 void mouse_handler(struct regs *r) // struct regs *r (not used but just there)
 {
@@ -66,9 +74,15 @@ void mouse_handler(struct regs *r) // struct regs *r (not used but just there)
         break;
     case 2:
         mouse_byte[2] = inb(0x60);
+        mouse_cycle++;
+        break;
+    case 3:
+        mouse_byte[3] = inb(0x60);
         mouse_click_data = mouse_byte[0];
         mouse_delta_x = mouse_byte[1];
         mouse_delta_y = mouse_byte[2];
+        if (mouse_can_scroll)
+            mouse_delta_z = mouse_byte[3];
 
         if (mouse_click_data & 0x1 && !mouse_left_clicked) {
             mouse_left_clicked = true;
@@ -91,6 +105,7 @@ void mouse_handler(struct regs *r) // struct regs *r (not used but just there)
             mouse_middle_clicked = false;
             on_mouse_middle_release();
         }
+        if (mouse_can_scroll && mouse_delta_z != 0) on_mouse_scroll();
 
         if (mouse_delta_x != 0 || mouse_delta_y != 0) on_mouse_move();
 
@@ -145,6 +160,18 @@ static inline uint8_t mouse_read()
     return inb(0x60);
 }
 
+void mouse_set_sample_rate(uint8_t sample_rate)
+{
+    outb(0x64, 0xD4); // tell the controller to address the mouse
+    outb(0x60, 0xF3); // write the mouse command code to the controller's data port
+    mouse_wait(0);    // wait
+    mouse_read();     // acknowledge
+    outb(0x64, 0xD4); // tell the controller to address the mouse
+    outb(0x60, sample_rate);  // write the parameter to the controller's data port
+    mouse_wait(0);    // wait
+    mouse_read();     // read back acknowledge. This should be 0xFA
+}
+
 void mouse_install()
 {
     uint8_t _status;
@@ -163,6 +190,16 @@ void mouse_install()
     mouse_wait(1);
     outb(0x60, _status);
 
+    // enable z axis
+    mouse_set_sample_rate(200);
+    mouse_set_sample_rate(100);
+    mouse_set_sample_rate(80);
+    // check if mouse actually has z axis support
+    mouse_write(0xF2);
+    mouse_read();
+    uint8_t mouseid = mouse_read();
+    if (mouseid == 3) mouse_can_scroll = true;
+
     // Tell the mouse to use default settings
     mouse_write(0xF6);
     mouse_read(); // Acknowledge
@@ -178,15 +215,3 @@ void mouse_install()
 void mouse_set_sens(double sens) {
     mouse_sens = sens;
 }
-
-// void mouse_set_sample_rate(uint8_t sample_rate)
-// {
-//     outb(0x64, 0xD4); // tell the controller to address the mouse
-//     outb(0x60, 0xF3); // write the mouse command code to the controller's data port
-//     mouse_wait(0);    // wait
-//     mouse_read();     // acknowledge
-//     outb(0x64, 0xD4); // tell the controller to address the mouse
-//     outb(0x60, sample_rate);  // write the parameter to the controller's data port
-//     mouse_wait(0);    // wait
-//     mouse_read();     // read back acknowledge. This should be 0xFA
-// }

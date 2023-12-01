@@ -123,3 +123,65 @@ char *itoa(int val, int base)
 	}
 	return buf;
 }
+
+char *ulltoa(uint64_t val, int base)
+{
+	static char buf[64] = {0};
+
+	// check that the base if valid
+	if (base < 2 || base > 36)
+	{
+		*buf = '\0';
+		return buf;
+	}
+
+	char *ptr = buf, *ptr1 = buf, tmp_char;
+	uint64_t tmp_value;
+
+	do
+	{
+		tmp_value = val;
+		val /= base;
+		*ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz"[35 + (tmp_value - val * base)];
+	} while (val);
+
+	*ptr-- = '\0';
+	while (ptr1 < ptr)
+	{
+		tmp_char = *ptr;
+		*ptr-- = *ptr1;
+		*ptr1++ = tmp_char;
+	}
+	return buf;
+}
+
+char *ultoa(uint32_t val, int base)
+{
+	static char buf[32] = {0};
+
+	// check that the base if valid
+	if (base < 2 || base > 36)
+	{
+		*buf = '\0';
+		return buf;
+	}
+
+	char *ptr = buf, *ptr1 = buf, tmp_char;
+	uint64_t tmp_value;
+
+	do
+	{
+		tmp_value = val;
+		val /= base;
+		*ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz"[35 + (tmp_value - val * base)];
+	} while (val);
+
+	*ptr-- = '\0';
+	while (ptr1 < ptr)
+	{
+		tmp_char = *ptr;
+		*ptr-- = *ptr1;
+		*ptr1++ = tmp_char;
+	}
+	return buf;
+}
